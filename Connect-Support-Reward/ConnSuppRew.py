@@ -1,9 +1,13 @@
 from google.appengine.api import users
 
+import os
+import jinja2
+
 import webapp2
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
+
         user = users.get_current_user()
         if user:
             greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
@@ -13,6 +17,18 @@ class MainPage(webapp2.RequestHandler):
                         users.create_login_url('/'))
 
         self.response.out.write('<html><body>%s</body></html>' % greeting)
+        # Setup template values
+        template_values = {
+            'name': 'Julien',
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_values))
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 
 application = webapp2.WSGIApplication([
