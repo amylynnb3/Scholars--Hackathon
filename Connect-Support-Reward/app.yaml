@@ -6,7 +6,7 @@ threadsafe: true
 
 handlers:
 - url: /.*
-  script: connsupprew.application
+  script: ConnSuppRew.application
 
 libraries:
 - name: jinja2
