@@ -1,4 +1,5 @@
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
 import os
 import jinja2
@@ -24,6 +25,18 @@ class MainPage(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
+
+class Member(ndb.Model):
+    userID= ndb.StringProperty(indexed=False)
+    fName=ndb.StringProperty(indexed=False)
+    homeSchool=ndb.StringProperty(indexed=True)
+    categories = ndb.StringProperty(indexed=True)
+    joinDate = ndb.DateTimeProperty(auto_now_add=True)
+
+def add_user(id, name, school, interest, date):
+    newUser = Member(userID = id, fname=name, homeSchool=school, categories=interest)
+    newUser.joinDate = datetime.datetime.now().date()
+    newUser.put()
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
