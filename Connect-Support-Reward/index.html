@@ -5,7 +5,11 @@
 </head>
 
 <body>
-<p>Hello to the World!</p>
+
+{% autoescape false %}
+<p>{{ greeting }}</p>
+{% endautoescape %}
+
 <p>{{ name }}</p>
 
 <img src="/images/hackothon.jpg" alt="Hackothon" />

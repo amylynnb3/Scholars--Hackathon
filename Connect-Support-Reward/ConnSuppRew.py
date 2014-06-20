@@ -16,9 +16,9 @@ class MainPage(webapp2.RequestHandler):
             greeting = ('<a href="%s">Sign in or register</a>.' %
                         users.create_login_url('/'))
 
-        self.response.out.write('<html><body>%s</body></html>' % greeting)
         # Setup template values
         template_values = {
+            'greeting': greeting,
             'name': 'Julien',
         }
 
