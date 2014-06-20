@@ -2,3 +2,4 @@ Connect-Support-Reward/app.yaml~
 Connect-Support-Reward/connsupprew.pyc
 *.py~
 *.html~
+*.db
