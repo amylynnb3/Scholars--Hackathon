@@ -2,9 +2,19 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 import os
+from google.appengine.ext import ndb
 import jinja2
 
 import webapp2
+
+INTEREST_LIST_ROOT = 'interest_list_root'
+def interestlist_key():
+    """Returns the root node of all interests (interest list)"""
+    return ndb.key('InterestList', INTEREST_LIST_ROOT)
+
+class Interest(ndb.Model):
+    """Models an individual interest."""
+    interest = ndb.StringProperty()
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -43,6 +53,22 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+
+# Ugly code - statically add all interests. Should be done dynamically later on.
+interest_names  = { 'Seeking Homework Help',
+                    'Professor and Course Suggestions',
+                    'Support Groups',
+                    'Tutoring Others',
+                    'Social Events',
+}
+for interest_name in interest_names:
+    # Check if already exists. If this is the case, then skip.
+    #int
+
+    #interest = Interest()
+    #interest.interest = interest_name
+    #interest.put();
+    pass
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
