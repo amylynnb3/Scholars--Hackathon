@@ -254,12 +254,15 @@ class Action(webapp2.RequestHandler):
 class Search (webapp2.RequestHandler):
    
     def get(self):
-        interests_query = Interest.query(
-            ancestor=interestlist_key())
+        interests_query = Interest.query( ancestor=interestlist_key() )
         interests = interests_query.fetch()
+
+        skills_query = Skill.query( ancestor=skilllist_key() ).order(Skill.skill)
+        skills = skills_query.fetch()
 
         template_values={
             'interests': interests,
+            'skills': skills,
             'logout':users.create_logout_url('/')
         }
 

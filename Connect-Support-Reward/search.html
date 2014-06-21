@@ -24,6 +24,21 @@
 
 	{% endfor %}
 
+	<p>Have the following skills:</p>
+
+	{% for skill in skills %}
+
+	{% if skill.skillkey %}
+	<p class="interest">
+          <label>
+            <input type="checkbox" name="skill"  value ="{{ skill.skillkey }}" id="skill">
+            {{ skill.skill }}
+          </label>
+        </p>
+	{% endif %}
+
+	{% endfor %}
+
         <p class="edit"><input type="submit" name="edit" value="Search"></p>
         <p class="edit"><input type="submit" name="edit" value="My Profile"></p>
         <p class="edit"><input type="submit" name="edit" value="Logout"></p>
