@@ -67,10 +67,12 @@ class ViewProfile(webapp2.RequestHandler):
             interests_query = Interest.query( Interest.interestkey==category )
             interest_array.append(interests_query.fetch()[0].interest)
 
+        refers_num = Refers.getReferalNum(userID)
         template_values = {
             'userid': userID,
             'member': member,
             'categories': interest_array,
+            'refers_num': refers_num
         }
 
         template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
