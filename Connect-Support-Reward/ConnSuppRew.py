@@ -86,6 +86,7 @@ class ViewProfile(webapp2.RequestHandler):
             'categories': interest_array,
             'refers_num': refers_num,
             'myProfile': (userID == users.get_current_user().user_id()),
+            'myID': users.get_current_user().user_id(),
             'profilePic': profilePic
         }
 
@@ -191,7 +192,13 @@ class Action(webapp2.RequestHandler):
         elif typeofaction=="Edit my Profile":
             self.redirect("/join")
         elif typeofaction=="Thank You!":
-            print "yay"
+            referID = self.request.get('referID')
+            userID = self.request.get('userID')
+            print "userID is " + userID
+            print "referID is " + referID
+            Refers.addRefers(userID, referID)
+            time.sleep(1)
+            self.redirect("/viewProfile/"+userID)
 
         elif (typeofaction=="Logout"):
             self.redirect(users.create_logout_url('/'))
