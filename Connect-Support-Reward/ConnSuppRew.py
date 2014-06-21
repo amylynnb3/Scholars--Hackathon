@@ -221,6 +221,7 @@ class Search (webapp2.RequestHandler):
 
 class SearchResults (webapp2.RequestHandler):
     def get(self):
+        user= users.get_current_user()
         school = self.request.get('school')
         #self.response.write(school)
         interests = self.request.get('interest')
@@ -241,7 +242,7 @@ class SearchResults (webapp2.RequestHandler):
                 else:
                     flag = True
             if flag:
-                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID)])
+                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id()])
         #self.response.write(memberlist)
         template_values = {
             'searchResult':memberlist 
