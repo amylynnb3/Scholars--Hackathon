@@ -228,25 +228,28 @@ class Search (webapp2.RequestHandler):
 
 class SearchResults (webapp2.RequestHandler):
     def get(self):
+        user= users.get_current_user()
         school = self.request.get('school')
         #self.response.write(school)
         interests = self.request.get('interest')
         interests = interests.split(',')
         memberlist=[]
         holder=Member.all()
-        
-        holder.filter('homeSchool =',school)
-        #self.response.write(holder.get().fName)
+        if school != "":
+            holder.filter('homeSchool =',school)
+            #self.response.write(holder.get().fName)
         flag=True
         for s in holder.run():
             self.response.write(s)
             for p in interests:
                 if p not in s.categories:
-                    self.response.write(s.categories)
+                   # self.response.write(s.categories)
                     flag = False
                     break
+                else:
+                    flag = True
             if flag:
-                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID)])
+                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id()])
         #self.response.write(memberlist)
         template_values = {
             'searchResult':memberlist 
