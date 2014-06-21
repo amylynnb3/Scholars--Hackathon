@@ -45,6 +45,7 @@ class MainPage(webapp2.RequestHandler):
 
 class ViewProfile(webapp2.RequestHandler):
     def get(self, userID=None):
+       
         
         if userID is None:
             # View my profile instead so fetch myself
@@ -52,6 +53,7 @@ class ViewProfile(webapp2.RequestHandler):
             user = users.get_current_user()
             userID = user.user_id()
             print "USERID=%s" % (userID)
+        
         else:
             myProfile = False
         
@@ -172,21 +174,30 @@ class Search (webapp2.RequestHandler):
 class SearchResults (webapp2.RequestHandler):
     def get(self):
         school = self.request.get('school')
+        #self.response.write(school)
         interests = self.request.get('interest')
         interests = interests.split(',')
         memberlist=[]
         holder=Member.all()
-        holder.filter('homeSchool=',school)
+        
+        holder.filter('homeSchool =',school)
+        #self.response.write(holder.get().fName)
+        flag=True
         for s in holder.run():
+            self.response.write(s)
             for p in interests:
                 if p not in s.categories:
+                    self.response.write(s.categories)
                     flag = False
                     break
             if flag:
-                memberlist.append(s)
-        self.response.write(memberlist)
+                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID)])
+        #self.response.write(memberlist)
+        template_values = {
+            'searchResult':memberlist 
+        }
         template= JINJA_ENVIRONMENT.get_template('searchresults.html')
-        self.response.write(template.render())
+        self.response.write(template.render(template_values))
 
 def getUserName(user_id):
     """ Return members name"""
