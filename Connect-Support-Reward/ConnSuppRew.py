@@ -10,6 +10,7 @@ import webapp2
 import cgi
 import urllib2
 import urllib
+import json
 
 INTEREST_LIST_ROOT = 'interest_list_root'
 API_KEY = 'AIzaSyBSk4BiVJLSiin08v1Tby69sLVDkBAoyho'
@@ -74,12 +75,13 @@ class ViewProfile(webapp2.RequestHandler):
 	    	
 
         refers_num = Refers.getReferalNum(userID)
-        #getProfilePic(userID)
+        profilePic = getProfilePic(userID)
         template_values = {
             'userid': userID,
             'member': member,
             'categories': interest_array,
-            'refers_num': refers_num
+            'refers_num': refers_num,
+            'profilePic': profilePic 
         }
 
         template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
@@ -230,15 +232,26 @@ def add_user(userid, name, school, interest):
         newUser.put()
 
 def getProfilePic(id):
-	req = "https://www.googleapis.com/plus/v1/people/" + id + "?fields=image&key=" + API_KEY
-	print "trying to get profile pic"
-	print req
-	try:
+    req = "https://www.googleapis.com/plus/v1/people/" + id + "?fields=image&key=" + API_KEY
+    default = "https://www.googleapis.com/plus/v1/people/105168348107704411028?fields=image&key=" + API_KEY
+    print "trying to get profile pic"
+    print req
+    url = ""
+    try:
             print urllib2.urlopen(req).read()
-	except URLError, exception_variable:
+            result = urllib2.urlopen(default)
+            resultJSON = json.loads(result.read())
+            print resultJSON
+            url = resultJSON['image']['url']
+    except urllib2.URLError, exception_variable:
             print exception_variable.reason
             print "id is does not exist and there is no profile picture"
             print "getting default picture"
+            result = urllib2.urlopen(default)
+            resultJSON = json.loads(result.read())
+            print resultJSON
+            url = resultJSON['image']['url']
+    return url
 
         
 
