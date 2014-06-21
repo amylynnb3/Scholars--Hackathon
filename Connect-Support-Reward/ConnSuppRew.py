@@ -98,7 +98,7 @@ class ViewProfile(webapp2.RequestHandler):
             'refers_num': refers_num,
             'myProfile': (userID == users.get_current_user().user_id()),
             'myID': users.get_current_user().user_id(),
-            'profilePic': profilePic
+            'profilePic': profilePic, 
         }
 
         template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
@@ -184,6 +184,7 @@ class Member(db.Model):
     categories = db.StringProperty(indexed=True)
     skills = db.StringProperty(indexed=True)
     joinDate = db.DateProperty(auto_now_add=True)
+    email = db.StringProperty(indexed=True)
     def getCategoriesAsArray(self):
         categories = self.categories.split(',')
         rcategories = []
@@ -209,8 +210,9 @@ class Signup(webapp2.RequestHandler):
         skill = self.request.get('skill', allow_multiple=True)
         interest = ', '.join(interest)
         skill = ', '.join(skill)
+        email = user.email()
         # Add or update user
-        member = add_or_update_user(user.user_id(), name, school, interest, skill)
+        member = add_or_update_user(user.user_id(), name, school, interest, skill, email)
         # Wait a bit
         time.sleep(2)
         self.redirect("/viewProfile/"+user.user_id())
@@ -297,7 +299,7 @@ class SearchResults (webapp2.RequestHandler):
                             flag = False
                             break
             if flag:
-                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id()])
+                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id(), user.email()])
         #self.response.write(memberlist)
         template_values = {
             'searchResult':memberlist ,
@@ -348,7 +350,7 @@ class Skill(ndb.Model):
     skillkey = ndb.StringProperty()
     skill = ndb.StringProperty()
 
-def add_or_update_user(userid, name, school, interest, skill):
+def add_or_update_user(userid, name, school, interest, skill, email):
 
     # Update existing member
     if userAMember(userid):
@@ -360,9 +362,10 @@ def add_or_update_user(userid, name, school, interest, skill):
             member.homeSchool = school
             member.categories = interest
             member.skills = skill
+            member.email = email
     else:
         # Create new member
-        member = Member(userID = userid, fName=name, homeSchool=school, categories=interest, skills=skill)
+        member = Member(userID = userid, fName=name, homeSchool=school, categories=interest, skills=skill, email=email)
         member.joinDate = datetime.datetime.now().date()
         refers = Refers(userID = userid, refers = [])
         refers.put()
