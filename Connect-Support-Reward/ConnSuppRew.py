@@ -74,7 +74,7 @@ class ViewProfile(webapp2.RequestHandler):
 	    	
 
         refers_num = Refers.getReferalNum(userID)
-        # getProfilePic(userID)
+        #getProfilePic(userID)
         template_values = {
             'userid': userID,
             'member': member,
@@ -221,17 +221,17 @@ def add_user(userid, name, school, interest):
         refers = Refers(userID = userid, refers = [])
         refers.put()
         newUser.put()
-#     getProfilePic(userid)
 
-# def getProfilePic(id):
-# 	req = "https://www.googleapis.com/plus/v1/people/" + id + "?fields=image&key=" + API_KEY
-# 	print "trying to get profile pic"
-# 	print req
-# 	try:
-# 		print urllib2.urlopen(req).read()
-# 	except URLError, exception_variable:
-# 		print "id is does not exist and there is no profile picture"
-# 		print "getting default picture"
+def getProfilePic(id):
+	req = "https://www.googleapis.com/plus/v1/people/" + id + "?fields=image&key=" + API_KEY
+	print "trying to get profile pic"
+	print req
+	try:
+            print urllib2.urlopen(req).read()
+	except URLError, exception_variable:
+            print exception_variable.reason
+            print "id is does not exist and there is no profile picture"
+            print "getting default picture"
 
         
 
