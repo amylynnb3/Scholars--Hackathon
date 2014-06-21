@@ -75,8 +75,14 @@ class Join(webapp2.RequestHandler):
         user= users.get_current_user()
         greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
                         (getUserName(user.user_id()), users.create_logout_url('/')))
+
+        interests_query = Interest.query(
+            ancestor=interestlist_key())
+        interests = interests_query.fetch()
+
         template_values={
             'greeting': greeting,
+            'interests': interests,
         }
 
         template = JINJA_ENVIRONMENT.get_template('completeProfile.html')
@@ -128,6 +134,7 @@ def interestlist_key():
 
 class Interest(ndb.Model):
     """Models an individual interest."""
+    interestkey = ndb.StringProperty()
     interest = ndb.StringProperty()
 
 def add_user(id, name, school, interest, date):
@@ -153,22 +160,23 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 
 # Ugly code - statically add all interests. Should be done dynamically later on.
-interest_names  = { 'Seeking Homework Help',
-                    'Professor and Course Suggestions',
-                    'Support Groups',
-                    'Tutoring Others',
-                    'Social Events',
+interest_list  = { ('seeking', 'Seeking Homework Help'),
+                    ('professor', 'Professor and Course Suggestions'),
+                    ('support', 'Support Groups'),
+                    ('tutor', 'Tutoring Others'),
+                    ('social', 'Social Events'),
 }
 
-for interest_name in interest_names:
-    print "Adding %s" % (interest_names)
+for (interest_key, interest_name) in interest_list:
+    print "Adding %s" % (interest_name)
     # Check if already exists. If this is the case, then skip.
     interests_query = Interest.query(
-        Interest.interest==interest_name)
+        Interest.interestkey==interest_key)
     interests = interests_query.fetch()
     if (len(interests)==0):
         # Create the new interest
         interest = Interest( parent=interestlist_key() )
+        interest.interestkey = interest_key
         interest.interest = interest_name
         interest.put()
 

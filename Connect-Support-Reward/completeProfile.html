@@ -14,36 +14,21 @@
         <p><input type="text" name="fname" value="" placeholder="First Name"></p>
         <p><input type="text" name="location" value="" placeholder="School Name"></p>
         <p>Interests:</p>
-        <p class="interest">
+	{% for interest in interests %}
+	
+	{% if interest.interestkey %}
+
+	<p class="interest">
           <label>
-            <input type="checkbox" name="interest"  value ="seeking" id="interest">
-            Seeking Homework Help
+            <input type="checkbox" name="interest"  value ="{{ interest.interestkey }}" id="interest">
+            {{ interest.interest }}
           </label>
         </p>
-        <p class="interest">
-          <label>
-            <input type="checkbox" name="interest" value="professor" id="interest">
-                Professor and Course Suggestions
-          </label>
-        </p>
-        <p class="interest">
-          <label>
-            <input type="checkbox" name="interest" value="support" id="interest">
-                Support Groups
-          </label>
-        </p>
-        <p class="interest">
-          <label>
-            <input type="checkbox" name="interest" value="tutor" id="interest">
-                Tutoring Others
-          </label>
-        </p>
-        <p class="interest">
-          <label>
-            <input type="checkbox" name="interest" value="social" id="interest">
-                Social Events
-          </label>
-        </p>
+
+	{% endif %}
+
+	{% endfor %}
+
         <p class="submit"><input type="submit" name="commit" value="Submit"></p>
       </form>
     </div>
