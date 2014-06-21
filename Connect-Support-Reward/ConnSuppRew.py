@@ -8,8 +8,11 @@ import jinja2
 import datetime
 import webapp2
 import cgi
+import urllib2
+import urllib
 
 INTEREST_LIST_ROOT = 'interest_list_root'
+API_KEY = 'AIzaSyBSk4BiVJLSiin08v1Tby69sLVDkBAoyho'
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -54,20 +57,24 @@ class ViewProfile(webapp2.RequestHandler):
         
         member = Member.all().filter("userID =", userID).fetch(1)
 
-        if(member != None):
+        if(len(member) > 0):
         	member = member[0]
         else:
         	member = ""
-
-        # Hack - pull categories as array
-        categories_array = member.getCategoriesAsArray();
-        # Retrieve complete interest info for each category
         interest_array = []
-        for category in categories_array:
-            interests_query = Interest.query( Interest.interestkey==category )
-            interest_array.append(interests_query.fetch()[0].interest)
+        # Hack - pull categories as array
+        if(member != ""):
+        	categories_array = member.getCategoriesAsArray();
+	        # Retrieve complete interest info for each category
+	        for category in categories_array:
+	            interests_query = Interest.query( Interest.interestkey==category )
+	            i = interests_query.fetch()
+	            if(len(i) > 0):
+	            	interest_array.append(i[0].interest)
+	    	
 
         refers_num = Refers.getReferalNum(userID)
+        # getProfilePic(userID)
         template_values = {
             'userid': userID,
             'member': member,
@@ -217,6 +224,18 @@ def add_user(userid, name, school, interest):
         refers = Refers(userID = userid, refers = [])
         refers.put()
         newUser.put()
+#     getProfilePic(userid)
+
+# def getProfilePic(id):
+# 	req = "https://www.googleapis.com/plus/v1/people/" + id + "?fields=image&key=" + API_KEY
+# 	print "trying to get profile pic"
+# 	print req
+# 	try:
+# 		print urllib2.urlopen(req).read()
+# 	except URLError, exception_variable:
+# 		print "id is does not exist and there is no profile picture"
+# 		print "getting default picture"
+
         
 
 class Refers(db.Expando):
@@ -237,7 +256,11 @@ class Refers(db.Expando):
 		"""given the user id, this returns the number of referals a user has"""
 		q = cls.all()
 		q.filter("userID = ", id)
-		return len(q[0].refers)
+		if(q != None and q.get() != None):
+			r = q.get()
+			return len(r.refers)
+		else:
+			return 0
 
 	@classmethod
 	def addRefers(cls,id, referID):
