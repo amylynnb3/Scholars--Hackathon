@@ -40,6 +40,24 @@ class MainPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
+class ViewProfile(webapp2.RequestHandler):
+    def get(self, userID):
+        
+        # MOCKUP MEMBER - REPLACE WITH ACTUAL FETCH FROM DB
+        member = Member.all().filter("userID =", userID).fetch(1)[0]
+
+        # Hack - pull categories as array
+        categories_array = member.getCategoriesAsArray();
+
+        template_values = {
+            'userid': userID,
+            'member': member,
+            'categories': categories_array,
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
+        self.response.write(template.render(template_values))
+
 
 class Join(webapp2.RequestHandler):
     """Page for users to become members"""
@@ -62,6 +80,7 @@ class Member(db.Model):
     categories = db.StringProperty(indexed=True)
     joinDate = db.DateProperty(auto_now_add=True)
 
+
 class Signup(webapp2.RequestHandler):
     """ Signup page """
     def post(self):
@@ -80,6 +99,10 @@ def getUserName(user_id):
     p = holder.get()
     return p.fName
 
+def getCategoriesAsArray(self):
+        return self.categories.split(',');
+
+
 def userAMember(user_id):
     """Returns true if user is a member of the site"""
     holder = Member.all()
@@ -97,6 +120,8 @@ class Interest(ndb.Model):
     """Models an individual interest."""
     interest = ndb.StringProperty()
 
+def add_user(id, name, school, interest, date):
+    newUser = Member(userID = id, fname=name, homeSchool=school, categories=interest)
 
 def add_user(userid, name, school, interest):
 
@@ -138,5 +163,7 @@ for interest_name in interest_names:
         interest.put()
 
 application = webapp2.WSGIApplication([
+    ('/', MainPage),
+    ('/viewProfile/(\w+)', ViewProfile),
     ('/', MainPage),('/join',Join), ('/signup', Signup),
 ], debug=True)
