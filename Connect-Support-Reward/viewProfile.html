@@ -6,12 +6,12 @@
 <body>
   <section class="container">
     <div class="profile">
-      <div style="width: 100%;">
+      <div style="width: 100%; overflow: hidden;">
         <div style="float: left;">
           <h1>{{ member.fName }}</h1>
+          <p>{{ member.fName }} has received ### "Thank You"s!</p>
         </div>
         <div id="thanks">
-          <p>Want to thank {{ member.fName }}?</p>
           <form method="post" action="index.html">
             <p class="edit"><input type="submit" name="thanks" value="Thank You!"></p>
           </form>
@@ -25,7 +25,6 @@
 	{% endfor %}
 	</ul>
       <form method="post" action="../action">
-
         <p class="edit"><input type="submit" name="edit" value="Edit my Profile"></p>
         <p class="edit"><input type="submit" name="edit" value="Search Other Users"></p>
         <p class="edit"><input type="submit" name="edit" value="Logout"></p>
