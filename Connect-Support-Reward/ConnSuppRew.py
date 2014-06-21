@@ -121,6 +121,8 @@ class Action(webapp2.RequestHandler):
         self.response.write(typeofaction)
         if (typeofaction=="Search Other Users"):
             self.redirect("/search")
+        elif (typeofaction == "Search"):
+            self.redirect("/searchresults")
 
 class Search (webapp2.RequestHandler):
    
@@ -128,6 +130,10 @@ class Search (webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('search.html')
         self.response.write(template.render())
 
+class SearchResults (webapp2.RequestHandler):
+    def get(self):
+        template= JINJA_ENVIRONMENT.get_template('searchresults.html')
+        self.response.write(template.render())
 
 def getUserName(user_id):
     """ Return members name"""
@@ -154,9 +160,6 @@ class Interest(ndb.Model):
     """Models an individual interest."""
     interestkey = ndb.StringProperty()
     interest = ndb.StringProperty()
-
-def add_user(id, name, school, interest, date):
-    newUser = Member(userID = id, fname=name, homeSchool=school, categories=interest)
 
 def add_user(userid, name, school, interest):
 
@@ -202,5 +205,5 @@ application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/myProfile', ViewProfile),
     ('/viewProfile/(\w+)', ViewProfile),
-    ('/', MainPage),('/join',Join), ('/signup', Signup), ('/action',Action), ('/search', Search),
+    ('/', MainPage),('/join',Join), ('/signup', Signup), ('/action',Action), ('/search', Search), ('/searchresults', SearchResults),
 ], debug=True)
