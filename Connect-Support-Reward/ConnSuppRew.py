@@ -250,7 +250,7 @@ class Refers(db.Expando):
 			print "refer list:"
 			print referList
 			print referID in referList
-		if((referID in referList) == False):
+		if((referID in referList) == False and id != referID):
 			referList.append(referID)
 			print "added " + referID + " to the referList for user with id " + id
 		else:
