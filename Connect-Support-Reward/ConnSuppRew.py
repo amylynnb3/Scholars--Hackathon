@@ -110,14 +110,28 @@ class Signup(webapp2.RequestHandler):
         add_user(user.user_id(), name, school, interest)
         self.redirect("/viewProfile/"+user.user_id())
 
+
+class Action(webapp2.RequestHandler):
+    """Button functionality for each page"""
+    def post(self):
+        typeofaction = self.request.get('edit')
+        self.response.write(typeofaction)
+        if (typeofaction=="Search Other Users"):
+            self.redirect("/search")
+
+class Search (webapp2.RequestHandler):
+   
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('search.html')
+        self.response.write(template.render())
+
+
 def getUserName(user_id):
     """ Return members name"""
     holder = Member.all()
     holder.filter("userID = ", user_id)
     p = holder.get()
     return p.fName
-
-
 
 
 def userAMember(user_id):
@@ -185,5 +199,5 @@ application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/myProfile', ViewProfile),
     ('/viewProfile/(\w+)', ViewProfile),
-    ('/', MainPage),('/join',Join), ('/signup', Signup),
+    ('/', MainPage),('/join',Join), ('/signup', Signup), ('/action',Action), ('/search', Search),
 ], debug=True)
