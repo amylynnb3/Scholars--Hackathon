@@ -143,6 +143,9 @@ class Action(webapp2.RequestHandler):
         elif (typeofaction=="Logout"):
             self.redirect(users.create_logout_url('/'))
 
+        elif (typeofaction =="Login"):
+            self.redirect(users.create_login_url('/'))
+
 
 class Search (webapp2.RequestHandler):
    
