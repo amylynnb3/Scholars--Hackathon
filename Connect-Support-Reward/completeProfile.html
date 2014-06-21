@@ -6,39 +6,41 @@
   <section class="container">
     <div class="profile">
         <h1>Welcome!</h1>
+        {% autoescape false %}
+        <p>{{greeting}}
+        {% endautoescape %}
         <h2>Complete your profile by telling us your name, preferred email address, school, and interests.</h2>
-      <form method="post" action="index.html">
-        <p><input type="text" name="email" value="" placeholder="First Name"></p>
-        <p><input type="text" name="email" value="" placeholder="Email Address"></p>
+      <form method="post" action="/signup">
+        <p><input type="text" name="fname" value="" placeholder="First Name"></p>
         <p><input type="text" name="location" value="" placeholder="School Name"></p>
         <p>Interests:</p>
         <p class="interest">
           <label>
-            <input type="checkbox" name="interest" id="interest">
+            <input type="checkbox" name="interest"  value ="seeking" id="interest">
             Seeking Homework Help
           </label>
         </p>
         <p class="interest">
           <label>
-            <input type="checkbox" name="interest" id="interest">
+            <input type="checkbox" name="interest" value="professor" id="interest">
                 Professor and Course Suggestions
           </label>
         </p>
         <p class="interest">
           <label>
-            <input type="checkbox" name="interest" id="interest">
+            <input type="checkbox" name="interest" value="support" id="interest">
                 Support Groups
           </label>
         </p>
         <p class="interest">
           <label>
-            <input type="checkbox" name="interest" id="interest">
+            <input type="checkbox" name="interest" value="tutor" id="interest">
                 Tutoring Others
           </label>
         </p>
         <p class="interest">
           <label>
-            <input type="checkbox" name="interest" id="interest">
+            <input type="checkbox" name="interest" value="social" id="interest">
                 Social Events
           </label>
         </p>
