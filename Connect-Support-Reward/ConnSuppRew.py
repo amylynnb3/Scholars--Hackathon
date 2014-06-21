@@ -139,8 +139,16 @@ class Action(webapp2.RequestHandler):
 class Search (webapp2.RequestHandler):
    
     def get(self):
+        interests_query = Interest.query(
+            ancestor=interestlist_key())
+        interests = interests_query.fetch()
+
+        template_values={
+            'interests': interests,
+        }
+
         template = JINJA_ENVIRONMENT.get_template('search.html')
-        self.response.write(template.render())
+        self.response.write(template.render(template_values))
 
 class SearchResults (webapp2.RequestHandler):
     def get(self):
