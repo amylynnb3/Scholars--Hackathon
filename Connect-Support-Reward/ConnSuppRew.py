@@ -52,7 +52,12 @@ class ViewProfile(webapp2.RequestHandler):
         else:
             myProfile = False
         
-        member = Member.all().filter("userID =", userID).fetch(1)[0]
+        member = Member.all().filter("userID =", userID).fetch(1)
+
+        if(member != None):
+        	member = member[0]
+        else:
+        	member = ""
 
         # Hack - pull categories as array
         categories_array = member.getCategoriesAsArray();
@@ -172,9 +177,44 @@ def add_user(userid, name, school, interest):
     else:
         newUser = Member(userID = userid, fName=name, homeSchool=school, categories=interest)
         newUser.joinDate = datetime.datetime.now().date()
+        refers = Refers(userID = userid, refers = [])
+        refers.put()
         newUser.put()
         
 
+class Refers(db.Expando):
+	userID = db.StringProperty()
+	refers = db.StringListProperty()
+
+	@classmethod
+	def getRefers(cls,id):
+		q = cls.all()
+		q.filter("userID = ", id)
+		for i in q:
+			print i.refers
+		return q
+
+	@classmethod
+	def addRefers(cls,id, referID):
+		q = cls.all()
+		q.filter("userID = ", id)
+		print "trying to add refers"
+		if(q != None):
+			r = q.get()
+			referList = r.refers
+			print "user id is " + id
+			print "user that will refer is " + referID
+			print "refer list:"
+			print referList
+			print referID in referList
+		if((referID in referList) == False):
+			referList.append(referID)
+			print "added " + referID + " to the referList for user with id " + id
+		else:
+			print "user with id " + referID + " has already referred user with id " + id 
+		r.refers = referList
+		r.put()
+		return referList
 
 
 
