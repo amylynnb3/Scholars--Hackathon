@@ -15,6 +15,7 @@ import urllib
 import json
 
 INTEREST_LIST_ROOT = 'interest_list_root'
+SKILL_LIST_ROOT = 'skills_list_root'
 API_KEY = 'AIzaSyBSk4BiVJLSiin08v1Tby69sLVDkBAoyho'
 
 class MainPage(webapp2.RequestHandler):
@@ -67,6 +68,7 @@ class ViewProfile(webapp2.RequestHandler):
         else:
         	member = ""
         interest_array = []
+        skills_array = []
         # Hack - pull categories as array
         if(member != ""):
         	categories_array = member.getCategoriesAsArray();
@@ -76,6 +78,14 @@ class ViewProfile(webapp2.RequestHandler):
 	            i = interests_query.fetch()
 	            if(len(i) > 0):
 	            	interest_array.append(i[0].interest)
+
+                memberskills_array = member.getSkillsAsArray();
+	        # Retrieve complete skill info
+	        for skill in memberskills_array:
+	            skills_query = Skill.query( Skill.skillkey==skill )
+	            i = skills_query.fetch()
+	            if(len(i) > 0):
+	            	skills_array.append(i[0].skill)
 	    	
 
         refers_num = Refers.getReferalNum(userID)
@@ -84,6 +94,7 @@ class ViewProfile(webapp2.RequestHandler):
             'userid': userID,
             'member': member,
             'categories': interest_array,
+            'skills': skills_array,
             'refers_num': refers_num,
             'myProfile': (userID == users.get_current_user().user_id()),
             'myID': users.get_current_user().user_id(),
@@ -102,9 +113,11 @@ class Join(webapp2.RequestHandler):
 
         (user.nickname(), users.create_logout_url('/')))
 
-        # Fetch the list of interests
+        # Fetch the list of interests and skills
         interests_query = Interest.query( ancestor=interestlist_key() )
         interests = interests_query.fetch()
+        skills_query = Skill.query( ancestor=skilllist_key() ).order(+Skill.skill)
+        skills = skills_query.fetch()
 
         memberfName = ''
         memberhomeSchool = ''
@@ -115,6 +128,14 @@ class Join(webapp2.RequestHandler):
             intereststate.append( {
                 'interestkey': interest.interestkey,
                 'interest': interest.interest,
+                'state': ''
+            } );
+
+        skillstate = []
+        for skill in skills:
+            skillstate.append( {
+                'skillkey': skill.skillkey,
+                'skill': skill.skill,
                 'state': ''
             } );
 
@@ -136,12 +157,20 @@ class Join(webapp2.RequestHandler):
                     if intstate['interestkey'] in membercategories:
                         intstate['state'] = 'checked'
 
+
+                memberskills = member.getSkillsAsArray()
+                # Mark all member skills as checked
+                for sklstate in skillstate:
+                    if sklstate['skillkey'] in memberskills:
+                        sklstate['state'] = 'checked'
+
         template_values={
             # Prefill default values that are not used for new profiles
             'memberfName':memberfName,
             'memberhomeSchool':memberhomeSchool,
             'greeting': greeting,
             'intereststate': intereststate,
+            'skillstate': skillstate,
         }
 
         template = JINJA_ENVIRONMENT.get_template('completeProfile.html')
@@ -153,6 +182,7 @@ class Member(db.Model):
     fName=db.StringProperty(indexed=False)
     homeSchool=db.StringProperty(indexed=True)
     categories = db.StringProperty(indexed=True)
+    skills = db.StringProperty(indexed=True)
     joinDate = db.DateProperty(auto_now_add=True)
     def getCategoriesAsArray(self):
         categories = self.categories.split(',')
@@ -160,6 +190,14 @@ class Member(db.Model):
         for cat in categories:
             rcategories.append(cat.strip())
         return rcategories
+    def getSkillsAsArray(self):
+        if self.skills is None:
+            return []
+        skills = self.skills.split(',')
+        rskills = []
+        for skl in skills:
+            rskills.append(skl.strip())
+        return rskills
 
 class Signup(webapp2.RequestHandler):
     """ Signup page """
@@ -168,9 +206,11 @@ class Signup(webapp2.RequestHandler):
         name = self.request.get('fname')
         school = self.request.get('location')
         interest = self.request.get('interest', allow_multiple=True)
+        skill = self.request.get('skill', allow_multiple=True)
         interest = ', '.join(interest)
+        skill = ', '.join(skill)
         # Add or update user
-        member = add_or_update_user(user.user_id(), name, school, interest)
+        member = add_or_update_user(user.user_id(), name, school, interest, skill)
         # Wait a bit
         time.sleep(2)
         self.redirect("/viewProfile/"+user.user_id())
@@ -285,12 +325,21 @@ def interestlist_key():
     """Returns the root node of all interests (interest list)"""
     return ndb.Key('InterestList', INTEREST_LIST_ROOT)
 
+def skilllist_key():
+    """Returns the root node of all skills"""
+    return ndb.Key("SkillList", SKILL_LIST_ROOT)
+
 class Interest(ndb.Model):
     """Models an individual interest."""
     interestkey = ndb.StringProperty()
     interest = ndb.StringProperty()
 
-def add_or_update_user(userid, name, school, interest):
+class Skill(ndb.Model):
+    """Models an individual skill."""
+    skillkey = ndb.StringProperty()
+    skill = ndb.StringProperty()
+
+def add_or_update_user(userid, name, school, interest, skill):
 
     # Update existing member
     if userAMember(userid):
@@ -301,9 +350,10 @@ def add_or_update_user(userid, name, school, interest):
             member.fName = name
             member.homeSchool = school
             member.categories = interest
+            member.skills = skill
     else:
         # Create new member
-        member = Member(userID = userid, fName=name, homeSchool=school, categories=interest)
+        member = Member(userID = userid, fName=name, homeSchool=school, categories=interest, skills=skill)
         member.joinDate = datetime.datetime.now().date()
         refers = Refers(userID = userid, refers = [])
         refers.put()
@@ -408,6 +458,41 @@ for (interest_key, interest_name) in interest_list:
         interest.interestkey = interest_key
         interest.interest = interest_name
         interest.put()
+
+# Ugly code again - statically add all skills. Should be done dynamically later on (but will never happen!).
+skill_list = {
+    # Programming languages
+    ('ProgrammingLanguagesADA', 'Programming Languages: ADA'),
+    ('ProgrammingLanguagesBasic', 'Programming Languages: Basic'),
+    ('ProgrammingLanguagesC++', 'Programming Languages: C++'),
+    ('ProgrammingLanguagesC#', 'Programming Languages: C#'),
+    ('ProgrammingLanguagesJava', 'Programming Languages: Java'),
+    ('ProgrammingLanguagesPHP', 'Programming Languages: PHP'),
+    ('ProgrammingLanguagesPython', 'Programming Languages: Python'),
+    # Algos
+    ('AlgorithmsA*', 'Algorithms: A*'),
+    ('AlgorithmsDijkstra', 'Algorithms: Dijkstra'),
+    ('AlgorithmsKruskal', 'Algorithms: Kruskal'),
+    ('AlgorithmsPrim', 'Algorithms: Prim'),
+    # Data structures
+    ('DataStructuresArray', 'Data Structures: Array'),
+    ('DataStructuresHashMap', 'Data Structures: Hash Map'),
+    ('DataStructuresLinkedList', 'Data Structures: Linked List'),
+    ('DataStructuresList', 'Data Structures: List'),
+    ('DataStructuresQueue', 'Data Structures: Queue'),
+    ('DataStructuresStack', 'Data Structures: Stack'),
+}
+for (skill_key, skill_name) in skill_list:
+    print "Adding %s" % (skill_name)
+    # Check if already exists. If this is the case, then skip.
+    skill_query = Skill.query( Skill.skillkey==skill_key )
+    skills = skill_query.fetch()
+    if (len(skills)==0):
+        # Create the new skill
+        skill = Skill( parent=skilllist_key() )
+        skill.skillkey = skill_key
+        skill.skill = skill_name
+        skill.put()
 
 # print "testing adding refers"
 # Refers.addRefers("185804764220139124118", "117015317981368465184")

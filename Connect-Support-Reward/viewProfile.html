@@ -31,6 +31,12 @@
 	   <li>{{ cat }}</li>
 	{% endfor %}
 	</ul>
+        <p>List of Skills:</p>
+        <ul class="interest">	
+	{% for skill in skills %}
+	   <li>{{ skill }}</li>
+	{% endfor %}
+	</ul>
       <form method="post" action="../action">
 	{% if myProfile %}
         <p class="edit"><input type="submit" name="edit" value="Edit my Profile"></p>
