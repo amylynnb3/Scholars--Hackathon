@@ -8,13 +8,6 @@ import jinja2
 import webapp2
 
 INTEREST_LIST_ROOT = 'interest_list_root'
-def interestlist_key():
-    """Returns the root node of all interests (interest list)"""
-    return ndb.key('InterestList', INTEREST_LIST_ROOT)
-
-class Interest(ndb.Model):
-    """Models an individual interest."""
-    interest = ndb.StringProperty()
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -35,6 +28,14 @@ class MainPage(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
+
+def interestlist_key():
+    """Returns the root node of all interests (interest list)"""
+    return ndb.Key('InterestList', INTEREST_LIST_ROOT)
+
+class Interest(ndb.Model):
+    """Models an individual interest."""
+    interest = ndb.StringProperty()
 
 class Member(ndb.Model):
     userID= ndb.StringProperty(indexed=False)
@@ -61,14 +62,18 @@ interest_names  = { 'Seeking Homework Help',
                     'Tutoring Others',
                     'Social Events',
 }
-for interest_name in interest_names:
-    # Check if already exists. If this is the case, then skip.
-    #int
 
-    #interest = Interest()
-    #interest.interest = interest_name
-    #interest.put();
-    pass
+for interest_name in interest_names:
+    print "Adding %s" % (interest_names)
+    # Check if already exists. If this is the case, then skip.
+    interests_query = Interest.query(
+        Interest.interest==interest_name)
+    interests = interests_query.fetch()
+    if (len(interests)==0):
+        # Create the new interest
+        interest = Interest( parent=interestlist_key() )
+        interest.interest = interest_name
+        interest.put()
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
