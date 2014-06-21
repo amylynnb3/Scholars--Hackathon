@@ -2,14 +2,22 @@
 <head>
   <link type="text/css" rel="stylesheet" href="/stylesheets/viewProfile.css" />
   <title>View your profile.</title>
+    <!-- Place this tag after the last widget tag. -->
+	<script type="text/javascript">
+	  (function() {
+		var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+		po.src = 'https://apis.google.com/js/platform.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	  })();
+	</script>
 </head>
 <body>
   <section class="container">
     <div class="profile">
       <div style="width: 100%; overflow: hidden;">
         <div style="float: left;">
-          <img id="profilePic" src="{{profilePic}}"></img>
-          <h1>{{ member.fName }}</h1>
+            <!-- Place this tag where you want the widget to render. -->
+	    <div class="g-person" style="margin-left: auto; margin-right: auto;" data-width="230" data-href="//plus.google.com/u/0/{{userid}}" data-theme="dark" data-showcoverphoto="false" data-rel="author"></div>
           <p>{{ member.fName }} has received {{refers_num}} "Thank You"s!</p>
         </div>
 	{% if not myProfile %}
