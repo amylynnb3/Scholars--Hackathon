@@ -254,14 +254,14 @@ for (interest_key, interest_name) in interest_list:
         interest.interest = interest_name
         interest.put()
 
-print "testing adding refers"
-Refers.addRefers("185804764220139124118", "117015317981368465184")
-print "testing getting refers"
-Refers.getRefers("185804764220139124118")
-Refers.getRefers("117015317981368465184")
-print "testing getting refer list amount"
-print Refers.getReferalNum("185804764220139124118")
-print Refers.getReferalNum("117015317981368465184")
+# print "testing adding refers"
+# Refers.addRefers("185804764220139124118", "117015317981368465184")
+# print "testing getting refers"
+# Refers.getRefers("185804764220139124118")
+# Refers.getRefers("117015317981368465184")
+# print "testing getting refer list amount"
+# print Refers.getReferalNum("185804764220139124118")
+# print Refers.getReferalNum("117015317981368465184")
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
