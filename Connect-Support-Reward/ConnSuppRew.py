@@ -40,10 +40,19 @@ class MainPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
+# TODO: MYPROFILE
+
 class ViewProfile(webapp2.RequestHandler):
     def get(self, userID):
         
-        # MOCKUP MEMBER - REPLACE WITH ACTUAL FETCH FROM DB
+        if userID is None:
+            # View my profile instead so fetch myself
+            myProfile = True
+            user = users.get_current_user()
+            userID = user.nickname()
+        else:
+            myProfile = False
+        
         member = Member.all().filter("userID =", userID).fetch(1)[0]
 
         # Hack - pull categories as array
@@ -164,6 +173,7 @@ for interest_name in interest_names:
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/myProfile', ViewProfile),
     ('/viewProfile/(\w+)', ViewProfile),
     ('/', MainPage),('/join',Join), ('/signup', Signup),
 ], debug=True)
