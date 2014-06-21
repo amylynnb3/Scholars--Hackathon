@@ -245,7 +245,8 @@ class SearchResults (webapp2.RequestHandler):
                 memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id()])
         #self.response.write(memberlist)
         template_values = {
-            'searchResult':memberlist 
+            'searchResult':memberlist ,
+            'length': len(memberlist)
         }
         template= JINJA_ENVIRONMENT.get_template('searchresults.html')
         self.response.write(template.render(template_values))
