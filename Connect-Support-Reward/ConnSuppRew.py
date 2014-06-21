@@ -147,6 +147,9 @@ class Action(webapp2.RequestHandler):
         elif typeofaction=="Edit my Profile":
             self.redirect("/join")
 
+        elif (typeofaction=="Logout"):
+            self.redirect(users.create_logout_url('/'))
+
 
 class Search (webapp2.RequestHandler):
    
@@ -157,6 +160,7 @@ class Search (webapp2.RequestHandler):
 
         template_values={
             'interests': interests,
+            'logout':users.create_logout_url('/')
         }
 
         template = JINJA_ENVIRONMENT.get_template('search.html')
@@ -165,7 +169,19 @@ class Search (webapp2.RequestHandler):
 class SearchResults (webapp2.RequestHandler):
     def get(self):
         school = self.request.get('school')
-        self.response.write(school)
+        interests = self.request.get('interest')
+        interests = interests.split(',')
+        memberlist=[]
+        holder=Member.all()
+        holder.filter('homeSchool=',school)
+        for s in holder.run():
+            for p in interests:
+                if p not in s.categories:
+                    flag = False
+                    break
+            if flag:
+                memberlist.append(s)
+        self.response.write(memberlist)
         template= JINJA_ENVIRONMENT.get_template('searchresults.html')
         self.response.write(template.render())
 
