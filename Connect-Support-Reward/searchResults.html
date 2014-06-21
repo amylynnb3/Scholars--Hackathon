@@ -8,21 +8,14 @@
     <div class="profile">
         <h1>Results</h1>
         <table class="interest">
+          {% for member in searchResult %}
             <tr>
-                <td>Random User</td>
-                <td>+12</td>
-                <td>link</td>
+                <td>{{ member[1] }}</td>
+                <td>{{ member[2] }}</td>
+                <td><a href="/viewProfile/{{ member[0] }}">View Profile</a></td>
             </tr>
-            <tr>
-                <td>Another User</td>
-                <td>+10</td>
-                <td>link</td>
-            </tr>
-            <tr>
-                <td>Third User</td>
-                <td>+6</td>
-                <td>link</td>
-            </tr>
+            
+            {% endfor %}
         </table>
       <form method="post" action="../action">
         <p class="edit"><input type="submit" name="edit" value="My Profile"></p>
