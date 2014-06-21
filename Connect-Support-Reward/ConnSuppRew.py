@@ -10,8 +10,11 @@ import webapp2
 import cgi
 import logging
 import time
+import urllib2
+import urllib
 
 INTEREST_LIST_ROOT = 'interest_list_root'
+API_KEY = 'AIzaSyBSk4BiVJLSiin08v1Tby69sLVDkBAoyho'
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -56,23 +59,29 @@ class ViewProfile(webapp2.RequestHandler):
         
         member = Member.all().filter("userID =", userID).fetch(1)
 
-        if(member != None):
+        if(len(member) > 0):
         	member = member[0]
         else:
         	member = ""
-
-        # Hack - pull categories as array
-        categories_array = member.getCategoriesAsArray();
-        # Retrieve complete interest info for each category
         interest_array = []
-        for category in categories_array:
-            interests_query = Interest.query( Interest.interestkey==category )
-            interest_array.append(interests_query.fetch()[0].interest)
+        # Hack - pull categories as array
+        if(member != ""):
+        	categories_array = member.getCategoriesAsArray();
+	        # Retrieve complete interest info for each category
+	        for category in categories_array:
+	            interests_query = Interest.query( Interest.interestkey==category )
+	            i = interests_query.fetch()
+	            if(len(i) > 0):
+	            	interest_array.append(i[0].interest)
+	    	
 
+        refers_num = Refers.getReferalNum(userID)
+        #getProfilePic(userID)
         template_values = {
             'userid': userID,
             'member': member,
             'categories': interest_array,
+            'refers_num': refers_num
         }
 
         template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
@@ -177,6 +186,16 @@ class Action(webapp2.RequestHandler):
         elif typeofaction=="Edit my Profile":
             self.redirect("/join")
 
+        elif (typeofaction=="Logout"):
+            self.redirect(users.create_logout_url('/'))
+
+        elif (typeofaction =="Login"):
+            self.redirect(users.create_login_url('/'))
+            
+        elif (typeofaction == "My Profile"):
+            user = users.get_current_user();
+            self.redirect("/viewProfile/"+user.user_id())
+
 
 class Search (webapp2.RequestHandler):
    
@@ -187,6 +206,7 @@ class Search (webapp2.RequestHandler):
 
         template_values={
             'interests': interests,
+            'logout':users.create_logout_url('/')
         }
 
         template = JINJA_ENVIRONMENT.get_template('search.html')
@@ -195,7 +215,19 @@ class Search (webapp2.RequestHandler):
 class SearchResults (webapp2.RequestHandler):
     def get(self):
         school = self.request.get('school')
-        self.response.write(school)
+        interests = self.request.get('interest')
+        interests = interests.split(',')
+        memberlist=[]
+        holder=Member.all()
+        holder.filter('homeSchool=',school)
+        for s in holder.run():
+            for p in interests:
+                if p not in s.categories:
+                    flag = False
+                    break
+            if flag:
+                memberlist.append(s)
+        self.response.write(memberlist)
         template= JINJA_ENVIRONMENT.get_template('searchresults.html')
         self.response.write(template.render())
 
@@ -245,7 +277,17 @@ def add_or_update_user(userid, name, school, interest):
     
     # Save member
     member.put(deadline=60)
-        
+
+def getProfilePic(id):
+	req = "https://www.googleapis.com/plus/v1/people/" + id + "?fields=image&key=" + API_KEY
+	print "trying to get profile pic"
+	print req
+	try:
+            print urllib2.urlopen(req).read()
+	except URLError, exception_variable:
+            print exception_variable.reason
+            print "id is does not exist and there is no profile picture"
+            print "getting default picture"
 
 class Refers(db.Expando):
 	userID = db.StringProperty()
@@ -265,7 +307,11 @@ class Refers(db.Expando):
 		"""given the user id, this returns the number of referals a user has"""
 		q = cls.all()
 		q.filter("userID = ", id)
-		return len(q[0].refers)
+		if(q != None and q.get() != None):
+			r = q.get()
+			return len(r.refers)
+		else:
+			return 0
 
 	@classmethod
 	def addRefers(cls,id, referID):
@@ -281,7 +327,7 @@ class Refers(db.Expando):
 			print "refer list:"
 			print referList
 			print referID in referList
-		if((referID in referList) == False):
+		if((referID in referList) == False and id != referID):
 			referList.append(referID)
 			print "added " + referID + " to the referList for user with id " + id
 		else:
