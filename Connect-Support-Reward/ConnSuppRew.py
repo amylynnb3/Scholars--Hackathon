@@ -64,7 +64,7 @@ class Join(webapp2.RequestHandler):
     def get(self):
         user= users.get_current_user()
         greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
-                        (getUserName(user.user_id()), users.create_logout_url('/')))
+                        (user.nickname(), users.create_logout_url('/')))
         template_values={
             'greeting': greeting,
         }
