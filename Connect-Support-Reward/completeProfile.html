@@ -15,13 +15,14 @@
         <p><input type="text" name="fname" value="{{ memberfName }}" placeholder="First Name"></p>
         <p><input type="text" name="location" value="{{ memberhomeSchool }}" placeholder="School Name"></p>
         <p>Interests:</p>
-	{% for interest in interests %}
+
+	{% for interest in intereststate %}
 	
 	{% if interest.interestkey %}
 
 	<p class="interest">
           <label>
-            <input type="checkbox" name="interest"  value ="{{ interest.interestkey }}" id="interest">
+            <input type="checkbox" name="interest"  value ="{{ interest.interestkey }}" id="interest" {{ interest.state }}>
             {{ interest.interest }}
           </label>
         </p>
