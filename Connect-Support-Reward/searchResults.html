@@ -8,6 +8,11 @@
     <div class="profile">
         <h1>Results</h1>
         <table class="interest">
+          <tr>
+            <th> Member Name </th>
+            <th> Number of Thank You's</th>
+            <th> Link </th>
+          </tr>
           {% for member in searchResult %}
             <tr>
                 <td>{{ member[1] }}</td>
@@ -31,7 +36,7 @@
           gapi.hangout.render('placeholder-rr', {
             'render': 'createhangout',
             
-            'invites':[{% for member in searchResult %} {% if member[3] != member[0] %}{'id': {{member[0]}}, 'invite_type':'PROFILE'},{% endif %} {% endfor %}],
+            'invites':[{% for member in searchResult %} {% if member[3] != member[0] %}{'id': '{{ member[4] }}', 'invite_type':'EMAIL'},{% endif %} {% endfor %}],
             'initial_apps': [{'app_id' : '184219133185', 'start_data' : 'dQw4w9WgXcQ', 'app_type' : 'ROOM_APP' }],
             'widget_size': 175
           });
