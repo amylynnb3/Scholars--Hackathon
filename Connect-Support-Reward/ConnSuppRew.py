@@ -42,10 +42,11 @@ class MainPage(webapp2.RequestHandler):
 
 
 class Join(webapp2.RequestHandler):
+    """Page for users to become members"""
     def get(self):
         user= users.get_current_user()
         greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
-                        (user.user_id(), users.create_logout_url('/')))
+                        (getUserName(user.user_id()), users.create_logout_url('/')))
         template_values={
             'greeting': greeting,
         }
@@ -54,13 +55,33 @@ class Join(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 class Member(db.Model):
+    """Models a user"""
     userID= db.StringProperty(indexed=True)
     fName=db.StringProperty(indexed=False)
     homeSchool=db.StringProperty(indexed=True)
     categories = db.StringProperty(indexed=True)
     joinDate = db.DateProperty(auto_now_add=True)
 
+class Signup(webapp2.RequestHandler):
+    """ Signup page """
+    def post(self):
+        user = users.get_current_user()
+        name = self.request.get('fname')
+        school = self.request.get('location')
+        interest = self.request.get('interest', allow_multiple=True)
+        interest = ', '.join(interest)
+        add_user(user.user_id(), name, school, interest)
+        self.redirect("/viewProfile/"+user.user_id())
+
+def getUserName(user_id):
+    """ Return members name"""
+    holder = Member.all()
+    holder.filter("userID = ", user_id)
+    p = holder.get()
+    return p.fName
+
 def userAMember(user_id):
+    """Returns true if user is a member of the site"""
     holder = Member.all()
     holder.filter("userID = ", user_id)
     if not holder.get():
@@ -78,19 +99,16 @@ class Interest(ndb.Model):
 
 
 def add_user(userid, name, school, interest):
-    newUser = Member(userID = userid, fName=name, homeSchool=school, categories=interest)
-    newUser.joinDate = datetime.datetime.now().date()
-    newUser.put()
 
-class Signup(webapp2.RequestHandler):
-    def post(self):
-        user = users.get_current_user()
-        name = self.request.get('fname')
-        school = self.request.get('location')
-        interest = self.request.get_all('interest')
-        interest = ', '.join(interest)
-        add_user(user.user_id(), name, school, interest)
-        self.redirect("/")
+    if userAMember(userid):
+       None
+    else:
+        newUser = Member(userID = userid, fName=name, homeSchool=school, categories=interest)
+        newUser.joinDate = datetime.datetime.now().date()
+        newUser.put()
+        
+
+
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
