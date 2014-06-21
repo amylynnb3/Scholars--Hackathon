@@ -22,6 +22,8 @@ class MainPage(webapp2.RequestHandler):
     def get(self):
 
         user = users.get_current_user()
+        if(user):
+            print user.email()
         test = "Not a member"
 
         if user:
@@ -86,10 +88,25 @@ class ViewProfile(webapp2.RequestHandler):
 	            i = skills_query.fetch()
 	            if(len(i) > 0):
 	            	skills_array.append(i[0].skill)
-	    	
+	    
 
         refers_num = Refers.getReferalNum(userID)
         profilePic = getProfilePic(userID)
+
+        """Jordan, Julien, Amy, Niaja"""
+
+        ids = ["105168348107704411028","114310736637055284221", "112848348255617561644", "115379392631720911895"]
+        if(member != ""):
+
+            if(member.fName == "Jordan"):
+                userID = ids[0]
+            elif(member.fName == "Julien"):
+                userID = ids[1]
+            elif(member.fName == "Amy"):
+                userID = ids[2]
+            elif(member.fName == "Niaja"):
+                userID = ids[3]
+
         template_values = {
             'userid': userID,
             'member': member,
