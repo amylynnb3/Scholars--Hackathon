@@ -8,6 +8,8 @@ import jinja2
 import datetime
 import webapp2
 import cgi
+import logging
+import time
 import urllib2
 import urllib
 import json
@@ -30,7 +32,7 @@ class MainPage(webapp2.RequestHandler):
             else:
                 greeting="Null"
                 self.redirect("/join")
-                #add_user(user.nickname(), "Bob", "Test University", "Helping Others")
+                #add__or_update_user(user.nickname(), "Bob", "Test University", "Helping Others")
         else:
             greeting = ('<a href="%s">Sign in or register</a>.' %
                         users.create_login_url('/'))
@@ -96,16 +98,46 @@ class Join(webapp2.RequestHandler):
 
         (user.nickname(), users.create_logout_url('/')))
 
-        interests_query = Interest.query(
-            ancestor=interestlist_key())
+        # Fetch the list of interests
+        interests_query = Interest.query( ancestor=interestlist_key() )
         interests = interests_query.fetch()
+
+        memberfName = ''
+        memberhomeSchool = ''
+
+        # Build a triple - intereststate: interestkey, interest, checked(or not)
+        intereststate = []
+        for interest in interests:
+            intereststate.append( {
+                'interestkey': interest.interestkey,
+                'interest': interest.interest,
+                'state': ''
+            } );
+
+        # If the user is already a member, then it shall be edited :-)
+        if userAMember(user.user_id()):
+            # Prefill its values to edit it
+            member = Member.all().filter("userID =", user.user_id()).fetch(1)
+
+            if(member != None):
+                member = member[0]
+
+                # Prefill stuff
+                memberfName = member.fName
+                memberhomeSchool = member.homeSchool
+                
+                membercategories = member.getCategoriesAsArray()
+                # Mark all member cats as checked
+                for intstate in intereststate:
+                    if intstate['interestkey'] in membercategories:
+                        intstate['state'] = 'checked'
 
         template_values={
             # Prefill default values that are not used for new profiles
-            'memberfName':'',
-            'memberhomeSchool':'',
+            'memberfName':memberfName,
+            'memberhomeSchool':memberhomeSchool,
             'greeting': greeting,
-            'interests': interests,
+            'intereststate': intereststate,
         }
 
         template = JINJA_ENVIRONMENT.get_template('completeProfile.html')
@@ -119,7 +151,11 @@ class Member(db.Model):
     categories = db.StringProperty(indexed=True)
     joinDate = db.DateProperty(auto_now_add=True)
     def getCategoriesAsArray(self):
-        return (s.strip() for s in self.categories.split(','));
+        categories = self.categories.split(',')
+        rcategories = []
+        for cat in categories:
+            rcategories.append(cat.strip())
+        return rcategories
 
 class Signup(webapp2.RequestHandler):
     """ Signup page """
@@ -129,7 +165,10 @@ class Signup(webapp2.RequestHandler):
         school = self.request.get('location')
         interest = self.request.get('interest', allow_multiple=True)
         interest = ', '.join(interest)
-        add_user(user.user_id(), name, school, interest)
+        # Add or update user
+        member = add_or_update_user(user.user_id(), name, school, interest)
+        # Wait a bit
+        time.sleep(2)
         self.redirect("/viewProfile/"+user.user_id())
 
 
@@ -220,16 +259,26 @@ class Interest(ndb.Model):
     interestkey = ndb.StringProperty()
     interest = ndb.StringProperty()
 
-def add_user(userid, name, school, interest):
+def add_or_update_user(userid, name, school, interest):
 
+    # Update existing member
     if userAMember(userid):
-       None
+        member = Member.all().filter("userID =", userid).fetch(1)
+
+        if(member != None):
+            member = member[0]
+            member.fName = name
+            member.homeSchool = school
+            member.categories = interest
     else:
-        newUser = Member(userID = userid, fName=name, homeSchool=school, categories=interest)
-        newUser.joinDate = datetime.datetime.now().date()
+        # Create new member
+        member = Member(userID = userid, fName=name, homeSchool=school, categories=interest)
+        member.joinDate = datetime.datetime.now().date()
         refers = Refers(userID = userid, refers = [])
         refers.put()
-        newUser.put()
+    
+    # Save member
+    member.put(deadline=60)
 
 def getProfilePic(id):
     req = "https://www.googleapis.com/plus/v1/people/" + id + "?fields=image&key=" + API_KEY
@@ -252,8 +301,6 @@ def getProfilePic(id):
             print resultJSON
             url = resultJSON['image']['url']
     return url
-
-        
 
 class Refers(db.Expando):
 	userID = db.StringProperty()
