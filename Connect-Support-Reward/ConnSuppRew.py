@@ -43,13 +43,14 @@ class MainPage(webapp2.RequestHandler):
 # TODO: MYPROFILE
 
 class ViewProfile(webapp2.RequestHandler):
-    def get(self, userID):
+    def get(self, userID=None):
         
         if userID is None:
             # View my profile instead so fetch myself
             myProfile = True
             user = users.get_current_user()
-            userID = user.nickname()
+            userID = user.user_id()
+            print "USERID=%s" % (userID)
         else:
             myProfile = False
         
