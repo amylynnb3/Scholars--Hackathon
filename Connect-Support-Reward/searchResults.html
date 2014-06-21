@@ -8,6 +8,11 @@
     <div class="profile">
         <h1>Results</h1>
         <table class="interest">
+          <tr>
+            <th> Member Name </th>
+            <th> Number of Thank You's</th>
+            <th> Link </th>
+          </tr>
           {% for member in searchResult %}
             <tr>
                 <td>{{ member[1] }}</td>

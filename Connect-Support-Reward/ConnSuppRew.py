@@ -290,15 +290,7 @@ class SearchResults (webapp2.RequestHandler):
         for s in holder.run():
             for p in interests:
                 for q in skillList:
-                    if q != '':
                         if (p in s.categories) and (q in s.skills):
-                       # self.response.write(s.categories)
-                            flag = True
-                        else:
-                            flag = False
-                            break
-                    else: 
-                        if (p in s.categories):
                        # self.response.write(s.categories)
                             flag = True
                         else:
