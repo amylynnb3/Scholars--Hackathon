@@ -190,6 +190,8 @@ class Action(webapp2.RequestHandler):
 
         elif typeofaction=="Edit my Profile":
             self.redirect("/join")
+        elif typeofaction=="Thank You!":
+            print "yay"
 
         elif (typeofaction=="Logout"):
             self.redirect(users.create_logout_url('/'))
@@ -253,6 +255,13 @@ def getUserName(user_id):
     holder.filter("userID = ", user_id)
     p = holder.get()
     return p.fName
+
+def getUserID(name):
+    """Return a member's id given a member's name"""
+    holder = Member.all()
+    holder.filter("fName = ", name)
+    p = holder.get()
+    return p.userID
 
 
 def userAMember(user_id):
