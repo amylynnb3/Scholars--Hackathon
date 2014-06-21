@@ -183,6 +183,7 @@ class Refers(db.Expando):
 
 	@classmethod
 	def getRefers(cls,id):
+		"""given the user id, this returns the referals a user has"""
 		q = cls.all()
 		q.filter("userID = ", id)
 		for i in q:
@@ -190,7 +191,15 @@ class Refers(db.Expando):
 		return q
 
 	@classmethod
+	def getReferalNum(cls, id):
+		"""given the user id, this returns the number of referals a user has"""
+		q = cls.all()
+		q.filter("userID = ", id)
+		return len(q[0].refers)
+
+	@classmethod
 	def addRefers(cls,id, referID):
+		"""given the user id and a referID, this adds a referID to the list of refers that belongs to the user"""
 		q = cls.all()
 		q.filter("userID = ", id)
 		print "trying to add refers"
@@ -239,6 +248,15 @@ for (interest_key, interest_name) in interest_list:
         interest.interestkey = interest_key
         interest.interest = interest_name
         interest.put()
+
+print "testing adding refers"
+Refers.addRefers("185804764220139124118", "117015317981368465184")
+print "testing getting refers"
+Refers.getRefers("185804764220139124118")
+Refers.getRefers("117015317981368465184")
+print "testing getting refer list amount"
+print Refers.getReferalNum("185804764220139124118")
+print Refers.getReferalNum("117015317981368465184")
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
