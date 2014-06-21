@@ -121,7 +121,7 @@ class Action(webapp2.RequestHandler):
         self.response.write(typeofaction)
         if typeofaction=="Search Other Users":
             self.redirect("/search")
-        elif typeofaction=="Edit my Profile"):
+        elif typeofaction=="Edit my Profile":
             self.redirect("/")
 
 class Search (webapp2.RequestHandler):
