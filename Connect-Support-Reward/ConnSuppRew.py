@@ -197,7 +197,7 @@ class Action(webapp2.RequestHandler):
             
         elif (typeofaction == "My Profile"):
             user = users.get_current_user();
-            self.redirect("/viewProfile/"+user.user_id())
+            self.redirect("/myProfile")
 
 
 class Search (webapp2.RequestHandler):
