@@ -316,7 +316,7 @@ class SearchResults (webapp2.RequestHandler):
                             flag = False
                             break
             if flag:
-                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id(), user.email()])
+                memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id(), s.email])
         #self.response.write(memberlist)
         template_values = {
             'searchResult':memberlist ,
