@@ -12,8 +12,8 @@
         {% endautoescape %}
         <h2>Complete your profile by telling us your name, preferred email address, school, and interests.</h2>
       <form method="post" action="/signup">
-        <p><input type="text" name="fname" value="" placeholder="First Name"></p>
-        <p><input type="text" name="location" value="" placeholder="School Name"></p>
+        <p><input type="text" name="fname" value="{{ memberfName }}" placeholder="First Name"></p>
+        <p><input type="text" name="location" value="{{ memberhomeSchool }}" placeholder="School Name"></p>
         <p>Interests:</p>
 	{% for interest in interests %}
 	

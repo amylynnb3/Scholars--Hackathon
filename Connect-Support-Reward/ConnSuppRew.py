@@ -90,6 +90,9 @@ class Join(webapp2.RequestHandler):
         interests = interests_query.fetch()
 
         template_values={
+            # Prefill default values that are not used for new profiles
+            'memberfName':'',
+            'memberhomeSchool':'',
             'greeting': greeting,
             'interests': interests,
         }
@@ -130,7 +133,7 @@ class Action(webapp2.RequestHandler):
             self.redirect("/searchresults")
 
         elif typeofaction=="Edit my Profile":
-            self.redirect("/")
+            self.redirect("/join")
 
 
 class Search (webapp2.RequestHandler):
