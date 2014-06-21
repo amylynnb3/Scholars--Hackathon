@@ -154,6 +154,7 @@ class Action(webapp2.RequestHandler):
             self.redirect(users.create_login_url('/'))
             
         elif (typeofaction == "My Profile"):
+            user = users.get_current_user();
             self.redirect("/viewProfile/"+user.user_id())
 
 
