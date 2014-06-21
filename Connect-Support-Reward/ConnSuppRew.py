@@ -227,7 +227,9 @@ class Action(webapp2.RequestHandler):
             location= self.request.get('location')
             interest = self.request.get('interest', allow_multiple=True)
             interest = ','.join(interest)
-            self.redirect("/searchresults?school="+location+'&interest='+interest)
+            skill = self.request.get('skill', allow_multiple=True)
+            skill = ','.join(skill)
+            self.redirect("/searchresults?school="+location+'&interest='+interest+'&skill='+skill)
 
         elif typeofaction=="Edit my Profile":
             self.redirect("/join")
@@ -276,6 +278,9 @@ class SearchResults (webapp2.RequestHandler):
         #self.response.write(school)
         interests = self.request.get('interest')
         interests = interests.split(',')
+        skillList = self.request.get('skill')
+        skillList = skillList.split(',')
+        #self.response.write(skillList)
         memberlist=[]
         holder=Member.all()
         if school != "":
@@ -283,14 +288,22 @@ class SearchResults (webapp2.RequestHandler):
             #self.response.write(holder.get().fName)
         flag=True
         for s in holder.run():
-            self.response.write(s)
             for p in interests:
-                if p not in s.categories:
-                   # self.response.write(s.categories)
-                    flag = False
-                    break
-                else:
-                    flag = True
+                for q in skillList:
+                    if q != '':
+                        if (p in s.categories) and (q in s.skills):
+                       # self.response.write(s.categories)
+                            flag = True
+                        else:
+                            flag = False
+                            break
+                    else: 
+                        if (p in s.categories):
+                       # self.response.write(s.categories)
+                            flag = True
+                        else:
+                            flag = False
+                            break
             if flag:
                 memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID), user.user_id()])
         #self.response.write(memberlist)
