@@ -175,6 +175,9 @@ class Signup(webapp2.RequestHandler):
 class Action(webapp2.RequestHandler):
     """Button functionality for each page"""
     def post(self):
+        user = users.get_current_user()
+        print user.user_id()
+        print self.request.url
         typeofaction = self.request.get('edit')
         self.response.write(typeofaction)
         if typeofaction=="Search Other Users":
@@ -187,6 +190,8 @@ class Action(webapp2.RequestHandler):
 
         elif typeofaction=="Edit my Profile":
             self.redirect("/join")
+        elif typeofaction=="Thank You!":
+            print "yay"
 
         elif (typeofaction=="Logout"):
             self.redirect(users.create_logout_url('/'))
