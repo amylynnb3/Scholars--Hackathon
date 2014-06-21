@@ -13,6 +13,10 @@ body {
   width: 640px;
 }
 
+#thanks {
+  float: right;
+}
+
 .profile {
   position: relative;
   margin: 0 auto;
