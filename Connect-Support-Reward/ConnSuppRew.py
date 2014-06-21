@@ -178,9 +178,6 @@ class Signup(webapp2.RequestHandler):
 class Action(webapp2.RequestHandler):
     """Button functionality for each page"""
     def post(self):
-        user = users.get_current_user()
-        print user.user_id()
-        print self.request.url
         typeofaction = self.request.get('edit')
         self.response.write(typeofaction)
         if typeofaction=="Search Other Users":
@@ -256,6 +253,13 @@ def getUserName(user_id):
     holder.filter("userID = ", user_id)
     p = holder.get()
     return p.fName
+
+def getUserID(name):
+    """Return a member's id given a member's name"""
+    holder = Member.all()
+    holder.filter("fName = ", name)
+    p = holder.get()
+    return p.userID
 
 
 def userAMember(user_id):
