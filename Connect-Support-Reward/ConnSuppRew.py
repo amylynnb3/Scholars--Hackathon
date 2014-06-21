@@ -119,8 +119,10 @@ class Action(webapp2.RequestHandler):
     def post(self):
         typeofaction = self.request.get('edit')
         self.response.write(typeofaction)
-        if (typeofaction=="Search Other Users"):
+        if typeofaction=="Search Other Users":
             self.redirect("/search")
+        elif typeofaction=="Edit my Profile"):
+            self.redirect("/")
 
 class Search (webapp2.RequestHandler):
    
