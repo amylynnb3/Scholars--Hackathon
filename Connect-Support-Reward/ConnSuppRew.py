@@ -225,17 +225,19 @@ class SearchResults (webapp2.RequestHandler):
         interests = interests.split(',')
         memberlist=[]
         holder=Member.all()
-        
-        holder.filter('homeSchool =',school)
-        #self.response.write(holder.get().fName)
+        if school != "":
+            holder.filter('homeSchool =',school)
+            #self.response.write(holder.get().fName)
         flag=True
         for s in holder.run():
             self.response.write(s)
             for p in interests:
                 if p not in s.categories:
-                    self.response.write(s.categories)
+                   # self.response.write(s.categories)
                     flag = False
                     break
+                else:
+                    flag = True
             if flag:
                 memberlist.append([s.userID,s.fName, Refers.getReferalNum(s.userID)])
         #self.response.write(memberlist)
