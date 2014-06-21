@@ -303,7 +303,7 @@ class SearchResults (webapp2.RequestHandler):
             'searchResult':memberlist ,
             'length': len(memberlist)
         }
-        template= JINJA_ENVIRONMENT.get_template('searchresults.html')
+        template= JINJA_ENVIRONMENT.get_template('searchResults.html')
         self.response.write(template.render(template_values))
 
 def getUserName(user_id):
