@@ -21,8 +21,8 @@ class MainPage(webapp2.RequestHandler):
 
             test = userAMember(user.user_id())
             if test:
-                greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
-                        (user.nickname(), users.create_logout_url('/')))
+                greeting = "Null"
+                self.redirect("/viewProfile/"+user.user_id())
             else:
                 greeting="Null"
                 self.redirect("/join")
@@ -79,7 +79,8 @@ class Member(db.Model):
     homeSchool=db.StringProperty(indexed=True)
     categories = db.StringProperty(indexed=True)
     joinDate = db.DateProperty(auto_now_add=True)
-
+    def getCategoriesAsArray(self):
+        return self.categories.split(',');
 
 class Signup(webapp2.RequestHandler):
     """ Signup page """
@@ -99,8 +100,7 @@ def getUserName(user_id):
     p = holder.get()
     return p.fName
 
-def getCategoriesAsArray(self):
-        return self.categories.split(',');
+
 
 
 def userAMember(user_id):
