@@ -81,7 +81,8 @@ class ViewProfile(webapp2.RequestHandler):
             'userid': userID,
             'member': member,
             'categories': interest_array,
-            'refers_num': refers_num
+            'refers_num': refers_num,
+            'myProfile': (userID == users.get_current_user().user_id()),
         }
 
         template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
