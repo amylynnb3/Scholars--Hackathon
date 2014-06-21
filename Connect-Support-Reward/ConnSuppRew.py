@@ -132,7 +132,10 @@ class Action(webapp2.RequestHandler):
         if typeofaction=="Search Other Users":
             self.redirect("/search")
         elif (typeofaction == "Search"):
-            self.redirect("/searchresults")
+            location= self.request.get('location')
+            interest = self.request.get('interest', allow_multiple=True)
+            interest = ','.join(interest)
+            self.redirect("/searchresults?school="+location+'&interest='+interest)
 
         elif typeofaction=="Edit my Profile":
             self.redirect("/join")
@@ -141,11 +144,21 @@ class Action(webapp2.RequestHandler):
 class Search (webapp2.RequestHandler):
    
     def get(self):
+        interests_query = Interest.query(
+            ancestor=interestlist_key())
+        interests = interests_query.fetch()
+
+        template_values={
+            'interests': interests,
+        }
+
         template = JINJA_ENVIRONMENT.get_template('search.html')
-        self.response.write(template.render())
+        self.response.write(template.render(template_values))
 
 class SearchResults (webapp2.RequestHandler):
     def get(self):
+        school = self.request.get('school')
+        self.response.write(school)
         template= JINJA_ENVIRONMENT.get_template('searchresults.html')
         self.response.write(template.render())
 
