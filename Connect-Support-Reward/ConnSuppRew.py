@@ -40,8 +40,6 @@ class MainPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
-# TODO: MYPROFILE
-
 class ViewProfile(webapp2.RequestHandler):
     def get(self, userID=None):
         
@@ -58,11 +56,16 @@ class ViewProfile(webapp2.RequestHandler):
 
         # Hack - pull categories as array
         categories_array = member.getCategoriesAsArray();
+        # Retrieve complete interest info for each category
+        interest_array = []
+        for category in categories_array:
+            interests_query = Interest.query( Interest.interestkey==category )
+            interest_array.append(interests_query.fetch()[0].interest)
 
         template_values = {
             'userid': userID,
             'member': member,
-            'categories': categories_array,
+            'categories': interest_array,
         }
 
         template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
@@ -97,7 +100,7 @@ class Member(db.Model):
     categories = db.StringProperty(indexed=True)
     joinDate = db.DateProperty(auto_now_add=True)
     def getCategoriesAsArray(self):
-        return self.categories.split(',');
+        return (s.strip() for s in self.categories.split(','));
 
 class Signup(webapp2.RequestHandler):
     """ Signup page """
