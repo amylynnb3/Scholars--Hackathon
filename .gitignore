@@ -3,3 +3,4 @@ Connect-Support-Reward/connsupprew.pyc
 *.py~
 *.html~
 *.db
+*.html#

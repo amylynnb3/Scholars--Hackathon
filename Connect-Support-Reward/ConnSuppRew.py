@@ -3,10 +3,13 @@ from google.appengine.ext import db
 
 
 import os
+from google.appengine.ext import ndb
 import jinja2
 import datetime
 import webapp2
 import cgi
+
+INTEREST_LIST_ROOT = 'interest_list_root'
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -37,6 +40,7 @@ class MainPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
+
 class Join(webapp2.RequestHandler):
     def get(self):
         user= users.get_current_user()
@@ -64,6 +68,15 @@ def userAMember(user_id):
     else: 
         return True
 
+def interestlist_key():
+    """Returns the root node of all interests (interest list)"""
+    return ndb.Key('InterestList', INTEREST_LIST_ROOT)
+
+class Interest(ndb.Model):
+    """Models an individual interest."""
+    interest = ndb.StringProperty()
+
+
 def add_user(userid, name, school, interest):
     newUser = Member(userID = userid, fName=name, homeSchool=school, categories=interest)
     newUser.joinDate = datetime.datetime.now().date()
@@ -85,6 +98,26 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+
+# Ugly code - statically add all interests. Should be done dynamically later on.
+interest_names  = { 'Seeking Homework Help',
+                    'Professor and Course Suggestions',
+                    'Support Groups',
+                    'Tutoring Others',
+                    'Social Events',
+}
+
+for interest_name in interest_names:
+    print "Adding %s" % (interest_names)
+    # Check if already exists. If this is the case, then skip.
+    interests_query = Interest.query(
+        Interest.interest==interest_name)
+    interests = interests_query.fetch()
+    if (len(interests)==0):
+        # Create the new interest
+        interest = Interest( parent=interestlist_key() )
+        interest.interest = interest_name
+        interest.put()
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),('/join',Join), ('/signup', Signup),
