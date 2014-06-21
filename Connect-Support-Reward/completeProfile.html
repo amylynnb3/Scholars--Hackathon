@@ -31,6 +31,23 @@
 
 	{% endfor %}
 
+        <p>Skills:</p>
+
+	{% for skill in skillstate %}
+
+	{% if skill.skillkey %}
+
+	<p class="interest">
+          <label>
+            <input type="checkbox" name="skill"  value ="{{ skill.skillkey }}" id="skill" {{ skill.state }}>
+            {{ skill.skill }}
+          </label>
+        </p>
+
+	{% endif %}
+
+	{% endfor %}
+
         <p class="submit"><input type="submit" name="commit" value="Submit"></p>
         <p class="edit"><input type="submit" name="logout" value="Logout"></p>
       </form>

@@ -15,7 +15,11 @@
 	{% if not myProfile %}
         <div id="thanks">
           <form method="post" action="../action">
-            <p class="edit"><input type="submit" name="thanks" value="Thank You!"></p>
+            <p class="edit">
+              <input type="hidden" name="userID" value="{{userid}}">
+              <input type="hidden" name="referID" value="{{myID}}">
+              <input type="submit" name="edit" value="Thank You!">
+            </p>
           </form>
         </div>
 	{% endif %}
@@ -25,6 +29,12 @@
         <ul class="interest">	
 	{% for cat in categories %}
 	   <li>{{ cat }}</li>
+	{% endfor %}
+	</ul>
+        <p>List of Skills:</p>
+        <ul class="interest">	
+	{% for skill in skills %}
+	   <li>{{ skill }}</li>
 	{% endfor %}
 	</ul>
       <form method="post" action="../action">
