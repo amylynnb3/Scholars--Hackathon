@@ -5,6 +5,17 @@
 <body>
   <section class="container">
     <div class="profile">
+        <h1>{{ userid }}</h1>
+        <h1>{{ member.fName }}</h1>
+	<p>{{ member.userID }}</p>
+	<p>{{ member.homeSchool }}</p>
+        <p>List of Interests:</p>
+        <ul class="interest">	
+	{% for cat in categories %}
+	   <li>{{ cat }}</li>
+	{% endfor %}
+	</ul>
+        <!--
         <h1>Amy Baldwin</h1>
         <p>amyusername</p>
         <p>amy@awesomeschool.edu</p>
@@ -17,6 +28,7 @@
             <li>Tutoring Others</li>
             <li>Social Events</li>
         </ul>
+	-->
         <form method="post" action="index.html">
         <p class="edit"><input type="submit" name="edit" value="Edit my Profile"></p>
         <p class="edit"><input type="submit" name="edit" value="Search Other Users"></p>

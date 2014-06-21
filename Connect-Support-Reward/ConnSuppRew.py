@@ -29,6 +29,28 @@ class MainPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
+class ViewProfile(webapp2.RequestHandler):
+    def get(self, userID):
+        
+        # MOCKUP MEMBER - REPLACE WITH ACTUAL FETCH FROM DB
+        member = Member(
+            userID='zmaster17',
+            fName='Julien G.-S.',
+            homeSchool='McGill',
+            categories='cat1,cat2,cat3');
+
+        # Hack - pull categories as array
+        categories_array = member.getCategoriesAsArray();
+
+        template_values = {
+            'userid': userID,
+            'member': member,
+            'categories': categories_array,
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('viewProfile.html')
+        self.response.write(template.render(template_values))
+
 def interestlist_key():
     """Returns the root node of all interests (interest list)"""
     return ndb.Key('InterestList', INTEREST_LIST_ROOT)
@@ -43,6 +65,10 @@ class Member(ndb.Model):
     homeSchool=ndb.StringProperty(indexed=True)
     categories = ndb.StringProperty(indexed=True)
     joinDate = ndb.DateTimeProperty(auto_now_add=True)
+
+    def getCategoriesAsArray(self):
+        return self.categories.split(',');
+            
 
 def add_user(id, name, school, interest, date):
     newUser = Member(userID = id, fname=name, homeSchool=school, categories=interest)
@@ -77,4 +103,5 @@ for interest_name in interest_names:
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/viewProfile/(\w+)', ViewProfile),
 ], debug=True)
