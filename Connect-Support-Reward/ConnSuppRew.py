@@ -96,7 +96,7 @@ class ViewProfile(webapp2.RequestHandler):
         """Jordan, Julien, Amy, Niaja"""
 
         ids = ["105168348107704411028","114310736637055284221", "112848348255617561644", "115379392631720911895"]
-        if(member != ""){
+        if(member != ""):
 
             if(member.fName == "Jordan"):
                 userID = ids[0]
@@ -106,8 +106,6 @@ class ViewProfile(webapp2.RequestHandler):
                 userID = ids[2]
             elif(member.fName == "Niaja"):
                 userID = ids[3]
-
-        }
 
         template_values = {
             'userid': userID,
